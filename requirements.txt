@@ -1,0 +1,3 @@
+argparse
+toml
+git+https://github.com/jsdanielh/python-client.git@2d545bc#egg=nimiqclient
