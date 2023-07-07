@@ -29,8 +29,9 @@ async def run_client(host, port, vrf, parent_hash, parent_election_hash,
         block = await client.get_latest_block()
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
-        logging.info("Running for block number: {}, block hash: {}".format(
-            block.number, block.hash))
+        logging.info(
+            f"Running for block number: {block.number}, block hash: "
+            f"{block.hash}")
 
         # Get accounts and validators
         accounts = await client.get_accounts()
@@ -62,11 +63,13 @@ async def run_client(host, port, vrf, parent_hash, parent_election_hash,
                                        'time_step': account.timeStep,
                                        'step_amount': account.stepAmount,
                                        'total_amount': account.totalAmount})
-            else:
+            elif account.type == 'basic':
                 parsed_basic_accounts.append({
                     'address': account.address,
                     'balance': account.balance,
                 })
+            else:
+                logging.debug(f"Ignoring account of type {account.type}")
 
         # Parse the validator objects to arrays of dictionaries with the
         # expected TOML data
@@ -106,13 +109,13 @@ async def run_client(host, port, vrf, parent_hash, parent_election_hash,
 
         file.write("\n")
         file.write(
-            "# File generated at {} from Nimiq Pos chain\n".format(
-                timestamp.isoformat()))
-        file.write("# - Block height: {}\n".format(block.number))
-        file.write("# - Block hash: {}\n\n".format(block.hash))
+            f"# File generated at {timestamp.isoformat()} ")
+        file.write("from Nimiq Pos chain\n")
+        file.write(f"# - Block height: {block.number}\n")
+        file.write(f"# - Block hash: {block.hash}\n\n")
 
         toml.dump(toml_output, file)
-        logging.info("Output written at '{}'".format(file_path))
+        logging.info(f"Output written at '{file_path}'")
         file.close()
 
 
@@ -161,7 +164,6 @@ def setup_logging(args):
     logging.getLogger().setLevel(log_level_name)
     logging.basicConfig(
         format='%(asctime)s %(levelname)-8s %(message)s',
-        level=logging.INFO,
         datefmt='%Y-%m-%d %H:%M:%S')
 
 
