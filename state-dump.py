@@ -112,7 +112,7 @@ async def run_client(host, port, vrf, parent_hash, parent_election_hash,
         file.write("# - Block hash: {}\n\n".format(block.hash))
 
         toml.dump(toml_output, file)
-        logging.info("Output written at {}".format(file_path))
+        logging.info("Output written at '{}'".format(file_path))
         file.close()
 
 
