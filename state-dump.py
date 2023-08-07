@@ -19,7 +19,7 @@ class Range(object):
 
 
 async def run_client(host, port, vrf, parent_hash, parent_election_hash,
-                     file_path):
+                     block_number, file_path):
     async with NimiqClient(
         scheme="ws", host=host, port=port
     ) as client:
@@ -83,6 +83,9 @@ async def run_client(host, port, vrf, parent_hash, parent_election_hash,
                                       'voting_key': validator.votingKey,
                                       'reward_address': validator.rewardAddress
                                       })
+            logging.info(
+                f"Found validator, address: {validator.address}, balance: "
+                "{validator.balance}")
             for staker in stakers.data:
                 parsed_stakers.append(
                     {'staker_address': staker.address,
@@ -96,6 +99,7 @@ async def run_client(host, port, vrf, parent_hash, parent_election_hash,
         toml_output['vrf_seed'] = vrf
         toml_output['parent_hash'] = parent_hash
         toml_output['parent_election_hash'] = parent_election_hash
+        toml_output['block_number'] = block_number
         if len(parsed_basic_accounts) != 0:
             toml_output['basic_accounts'] = parsed_basic_accounts
         if len(parsed_vesting) != 0:
@@ -124,6 +128,11 @@ def parse_args():
     Parse command line arguments:
     - RPC host
     - RPC port
+    - Output file
+    - Genesis VRF seed
+    - Genesis parent hash
+    - Genesis parent election hash
+    - Genesis block number
 
     :return The parsed command line arguments.
     :rtype: Namespace
@@ -143,6 +152,8 @@ def parse_args():
     parser.add_argument('-e', '--election', type=str, required=True,
                         help=("Parent election hash for the generated PoS "
                               "genesis TOML"))
+    parser.add_argument('-b', '--block', type=int, required=True,
+                        help="Genesis initial block number")
     parser.add_argument("--verbose", "-v", dest="log_level",
                         action="append_const", const=-1)
     return parser.parse_args()
@@ -176,7 +187,7 @@ def main():
 
     asyncio.get_event_loop().run_until_complete(
         run_client(args.host, args.port, args.vrf, args.parent, args.election,
-                   args.file)
+                   args.block, args.file)
     )
 
 
