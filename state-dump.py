@@ -78,11 +78,15 @@ async def run_client(host, port, vrf, parent_hash, parent_election_hash,
         for validator in validators.data:
             stakers = await client.get_stakers_by_validator_address(
                 validator.address)
-            parsed_validators.append({'validator_address': validator.address,
-                                      'signing_key': validator.signingKey,
-                                      'voting_key': validator.votingKey,
-                                      'reward_address': validator.rewardAddress
-                                      })
+            parsed_validators.append(
+                {'validator_address': validator.address,
+                 'signing_key': validator.signingKey,
+                 'voting_key': validator.votingKey,
+                 'reward_address': validator.rewardAddress,
+                 'inactive_from': validator.inactivityFlag,
+                 'retired': validator.retired,
+                 'jailed_from': validator.jailedFrom,
+                 })
             logging.info(
                 f"Found validator, address: {validator.address}, balance: "
                 "{validator.balance}")
@@ -90,7 +94,9 @@ async def run_client(host, port, vrf, parent_hash, parent_election_hash,
                 parsed_stakers.append(
                     {'staker_address': staker.address,
                      'balance': staker.balance,
-                     'delegation': staker.delegation})
+                     'delegation': staker.delegation,
+                     'inactive_balance': staker.inactiveBalance,
+                     'inactive_from': staker.inactiveFrom})
 
         # Now build a dictionary for taking it to TOML
         toml_output['name'] = 'test-albatross'
