@@ -89,8 +89,11 @@ async def run_client(host, port, vrf, parent_hash, parent_election_hash,
                  })
             logging.info(
                 f"Found validator, address: {validator.address}, balance: "
-                "{validator.balance}")
+                f"{validator.balance}")
             for staker in stakers.data:
+                # Enforce minimum stake
+                if staker.balance < 10000000:
+                    staker.balance = 10000000
                 parsed_stakers.append(
                     {'staker_address': staker.address,
                      'balance': staker.balance,
@@ -100,7 +103,6 @@ async def run_client(host, port, vrf, parent_hash, parent_election_hash,
 
         # Now build a dictionary for taking it to TOML
         toml_output['name'] = 'test-albatross'
-        toml_output['seed_message'] = 'Albatross TestNet'
         toml_output['timestamp'] = timestamp.isoformat()
         toml_output['vrf_seed'] = vrf
         toml_output['parent_hash'] = parent_hash
