@@ -103,6 +103,7 @@ async def run_client(host, port, vrf, parent_hash, parent_election_hash,
 
         # Now build a dictionary for taking it to TOML
         toml_output['name'] = 'test-albatross'
+        toml_output['network'] = 'TestAlbatross'
         toml_output['timestamp'] = timestamp.isoformat()
         toml_output['vrf_seed'] = vrf
         toml_output['parent_hash'] = parent_hash
