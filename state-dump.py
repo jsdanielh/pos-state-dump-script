@@ -19,7 +19,7 @@ class Range(object):
 
 
 async def run_client(host, port, vrf, parent_hash, parent_election_hash,
-                     block_number, file_path):
+                     history_root, block_number, file_path):
     async with NimiqClient(
         scheme="ws", host=host, port=port
     ) as client:
@@ -107,6 +107,7 @@ async def run_client(host, port, vrf, parent_hash, parent_election_hash,
         toml_output['timestamp'] = timestamp.isoformat()
         toml_output['vrf_seed'] = vrf
         toml_output['parent_hash'] = parent_hash
+        toml_output['history_root'] = history_root
         toml_output['parent_election_hash'] = parent_election_hash
         toml_output['block_number'] = block_number
         if len(parsed_basic_accounts) != 0:
@@ -161,6 +162,9 @@ def parse_args():
     parser.add_argument('-e', '--election', type=str, required=True,
                         help=("Parent election hash for the generated PoS "
                               "genesis TOML"))
+    parser.add_argument('-hr', '--history', type=str, required=True,
+                        help=("History root for the generated PoS genesis TOML"
+                              ))
     parser.add_argument('-b', '--block', type=int, required=True,
                         help="Genesis initial block number")
     parser.add_argument("--verbose", "-v", dest="log_level",
@@ -196,7 +200,7 @@ def main():
 
     asyncio.get_event_loop().run_until_complete(
         run_client(args.host, args.port, args.vrf, args.parent, args.election,
-                   args.block, args.file)
+                   args.history, args.block, args.file)
     )
 
 
